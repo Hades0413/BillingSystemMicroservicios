@@ -1,0 +1,43 @@
+# Archivos de compilación y temporales
+bin/
+obj/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de configuración del entorno de desarrollo
+.vscode/
+
+# Archivos de configuración de Visual Studio
+.vs/
+.vs2017/
+.vs2019/
+.vs2019-*
+
+# Archivos generados por el sistema de dependencias
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Archivos de dependencias locales
+.nuget/
+
+# Archivos de configuración de usuario
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.local.json
+
+# Archivos de herramientas de pruebas unitarias
+testresults/
+
+# Archivos específicos de Rider (JetBrains)
+.idea/
+
+# Archivos temporales de JetBrains Rider
+.idea/
+
+# Archivos de ASP.NET Core
+wwwroot/
+
