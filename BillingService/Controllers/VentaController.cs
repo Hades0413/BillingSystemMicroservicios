@@ -2,8 +2,6 @@ using BillingService.Models;
 using BillingService.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using BillingService.Models;
-using System;
 
 namespace BillingService.Controllers
 {
@@ -58,20 +56,16 @@ namespace BillingService.Controllers
             }
             catch (ArgumentException ex)
             {
-                // Captura de errores de validación de parámetros
                 return BadRequest($"Error de validación: {ex.Message}. Verifique los datos de entrada.");
             }
             catch (InvalidOperationException ex)
             {
-                // Captura de errores relacionados con la operación
                 return BadRequest($"Error de operación: {ex.Message}. Verifique los datos de entrada.");
             }
             catch (Exception ex)
             {
-                // Captura de cualquier otro error no esperado
                 return StatusCode(500, $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte.");
             }
         }
-
     }
 }

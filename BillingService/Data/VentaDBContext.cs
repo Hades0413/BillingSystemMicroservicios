@@ -7,6 +7,8 @@ namespace BillingService.Data
     {
         public DbSet<Venta> Ventas { get; set; }
         public DbSet<VentaProducto> VentaProductos { get; set; }
+        public DbSet<ControlNumeracion> ControlNumeracion { get; set; }
+        public DbSet<TipoComprobante> TipoComprobante { get; set; }
 
         public VentaDBContext(DbContextOptions<VentaDBContext> options) : base(options)
         {

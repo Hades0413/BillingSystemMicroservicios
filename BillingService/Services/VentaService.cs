@@ -15,7 +15,6 @@ namespace BillingService.Services
 
         public async Task<ResultadoVenta> RegistrarVentaAsync(int usuarioId, int empresaId, int clienteId, int tipoComprobanteId, string formaPago, List<VentaProducto> detallesVenta, string clienteRuc)
 {
-    // Validación de los parámetros de entrada
     if (usuarioId <= 0 || empresaId <= 0 || clienteId <= 0 || tipoComprobanteId <= 0 || detallesVenta == null || detallesVenta.Count == 0)
     {
         return new ResultadoVenta
@@ -29,9 +28,38 @@ namespace BillingService.Services
     {
         try
         {
-            // Calcular el total de la venta y el monto de impuestos
-            decimal montoTotal = detallesVenta.Sum(vp => vp.Cantidad * vp.PrecioUnitario); // Suma de cantidad * precio unitario
-            decimal montoImpuesto = montoTotal * 0.18m; // Asumiendo un 18% de impuesto
+            decimal montoTotal = detallesVenta.Sum(vp => vp.Cantidad * vp.PrecioUnitario); 
+            decimal montoImpuesto = montoTotal * 0.18m;
+
+            var tipoComprobante = await _dbContext.TipoComprobante
+                .Where(tc => tc.TipoComprobanteId == tipoComprobanteId)
+                .FirstOrDefaultAsync();
+
+            if (tipoComprobante == null)
+            {
+                return new ResultadoVenta
+                {
+                    Success = false,
+                    Mensaje = "Tipo de comprobante no válido o no encontrado. Verifique el tipo de comprobante e intente nuevamente."
+                };
+            }
+
+            var tipoComprobanteNombre = tipoComprobante.TipoComprobanteNombre;
+
+            var controlNumeracion = await _dbContext.ControlNumeracion
+                .Where(cn => cn.TipoComprobanteId == tipoComprobanteId)
+                .FirstOrDefaultAsync();
+
+            if (controlNumeracion == null)
+            {
+                return new ResultadoVenta
+                {
+                    Success = false,
+                    Mensaje = $"No se encontró la numeración para el tipo de comprobante '{tipoComprobanteNombre}'. Por favor, intente nuevamente."
+                };
+            }
+
+            string codigoVenta = $"{controlNumeracion.Prefijo}-{controlNumeracion.Numeracion:D6}";
 
             var venta = new Venta
             {
@@ -42,17 +70,22 @@ namespace BillingService.Services
                 VentaFormaPago = formaPago,
                 VentaFecha = DateTime.Now,
                 VentaMontoTotal = montoTotal,
-                VentaMontoDescuento = 0, // Ajusta esta lógica si se aplica descuento
+                VentaMontoDescuento = 0,
                 VentaMontoImpuesto = montoImpuesto,
                 VentaRucCliente = clienteRuc,
+                VentaCodigo = codigoVenta 
             };
 
+            controlNumeracion.Numeracion++;
+
             _dbContext.Ventas.Add(venta);
-            await _dbContext.SaveChangesAsync(); // Guardamos la venta para obtener su VentaId
+            await _dbContext.SaveChangesAsync();
+
+            _dbContext.ControlNumeracion.Update(controlNumeracion);
+            await _dbContext.SaveChangesAsync();
 
             foreach (var detalle in detallesVenta)
             {
-                // Calcular el total del producto (si no se calculó previamente)
                 detalle.Total = detalle.Cantidad * detalle.PrecioUnitario;
 
                 var ventaProducto = new VentaProducto
@@ -61,47 +94,42 @@ namespace BillingService.Services
                     ProductoId = detalle.ProductoId,
                     Cantidad = detalle.Cantidad,
                     PrecioUnitario = detalle.PrecioUnitario,
-                    Total = detalle.Total // Usamos el PrecioTotal calculado para el detalle
+                    Total = detalle.Total 
                 };
 
                 _dbContext.VentaProductos.Add(ventaProducto);
             }
 
-            await _dbContext.SaveChangesAsync(); // Guardamos los productos de la venta
+            await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            // Retornar ResultadoVenta con éxito y datos
             return new ResultadoVenta
             {
                 Success = true,
                 VentaId = venta.VentaId,
-                Mensaje = "Venta registrada con éxito."
+                Mensaje = $"Venta registrada con éxito. Código de venta: {codigoVenta}."
             };
         }
         catch (DbUpdateException dbEx)
         {
             await transaction.RollbackAsync();
-            Console.WriteLine($"Database Error: {dbEx.Message}");
             return new ResultadoVenta
             {
                 Success = false,
-                Mensaje = "Error al registrar la venta en la base de datos. Por favor, intente nuevamente."
+                Mensaje = "Error al registrar la venta en la base de datos. Verifique la información y los datos ingresados."
             };
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
-            Console.WriteLine($"General Error: {ex.Message}");
-            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
             return new ResultadoVenta
             {
                 Success = false,
-                Mensaje = "Ocurrió un error inesperado. Por favor, intente nuevamente."
+                Mensaje = "Ocurrió un error inesperado. Por favor, intente nuevamente. Si el problema persiste, contacte al soporte."
             };
         }
     }
 }
 
-        }
     }
-
+}

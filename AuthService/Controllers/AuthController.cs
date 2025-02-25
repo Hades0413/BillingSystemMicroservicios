@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using AuthService.Models;
 using AuthService.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuthService.Controllers
 {
@@ -25,37 +26,59 @@ namespace AuthService.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest loginRequest)
         {
-            var token = _authService.Login(loginRequest.Correo, loginRequest.Contrasena);
-            if (token == null)
+            try
             {
-                var errorResponse = new ErrorResponse("Credenciales incorrectas.");
-                return Unauthorized(errorResponse);
-            }
+                var token = _authService.Login(loginRequest.Correo, loginRequest.Contrasena);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new ErrorResponse("Credenciales incorrectas."));
+                }
 
-            var successResponse = new SuccessResponse("Login exitoso", new { token });
-            return Ok(successResponse);
+                return Ok(new SuccessResponse("Login exitoso", new { token }));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ErrorResponse("Hubo un problema al procesar la solicitud: " + ex.Message));
+            }
         }
 
         [HttpPost("oauth2-login")]
-        public async Task<IActionResult> OAuth2Login([FromBody] AuthServiceOAuthRequest oauthRequest) 
+        public async Task<IActionResult> OAuth2Login([FromBody] AuthServiceOAuthRequest oauthRequest)
         {
-            var isValid = await _oauthService.ValidateOAuthToken(oauthRequest.Token);
-            if (!isValid)
+            if (!await _oauthService.ValidateOAuthToken(oauthRequest.Token))
             {
-                var errorResponse = new ErrorResponse("OAuth token inválido.");
-                return Unauthorized(errorResponse);
+                return Unauthorized(new ErrorResponse("OAuth token inválido."));
             }
 
             var usuario = await _context.Usuario.FirstOrDefaultAsync(u => u.UsuarioCorreo == oauthRequest.Email);
             if (usuario == null)
             {
-                var errorResponse = new ErrorResponse("Usuario no encontrado.");
-                return BadRequest(errorResponse);
+                return BadRequest(new ErrorResponse("Usuario no encontrado."));
             }
 
             var token = _jwtService.GenerateJwtToken(usuario);
-            var successResponse = new SuccessResponse("Login exitoso", new { token });
-            return Ok(successResponse);
+            return Ok(new SuccessResponse("Login exitoso", new { token }));
         }
+
+        [Authorize]
+        [HttpGet("validate-token")]
+        public IActionResult ValidateToken()
+        {
+            try
+            {
+                return Ok(new SuccessResponse("Token válido."));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en ValidateToken: {ex.Message}");
+                return StatusCode(500, new ErrorResponse($"Error interno: {ex.Message}"));
+            }
+        }
+
+
     }
 }

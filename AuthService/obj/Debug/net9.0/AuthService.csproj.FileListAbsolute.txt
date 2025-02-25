@@ -89,3 +89,4 @@
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/AuthService.pdb
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/AuthService.genruntimeconfig.cache
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/ref/AuthService.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/AuthService.sourcelink.json

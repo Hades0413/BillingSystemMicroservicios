@@ -10,8 +10,7 @@ namespace BillingService.Models
         [Column("venta_id")]
         public int VentaId { get; set; }
         [Column("venta_codigo")]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)] // Remove the Computed attribute
-        public string VentaCodigo { get; set; } = Guid.NewGuid().ToString(); // Or any logic to generate the code
+        public string VentaCodigo { get; set; } = Guid.NewGuid().ToString();
 
         [Column("venta_fecha")]
         public DateTime VentaFecha { get; set; }

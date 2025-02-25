@@ -9,7 +9,7 @@ namespace BillingService.Models
     {
         [Key]
         [Column("venta_producto_id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Se especifica que es una columna de identidad
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VentaProductoId { get; set; } 
 
         [Column("venta_id")]
