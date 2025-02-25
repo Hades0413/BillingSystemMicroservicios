@@ -10,7 +10,7 @@ public class Venta
 
     [Column("venta_codigo")] public string VentaCodigo { get; set; } = Guid.NewGuid().ToString();
 
-    [Column("venta_fecha")] public DateTime VentaFecha { get; set; }
+    [Column("venta_fecha")] public DateTime VentaFecha { get; set; } = DateTime.Now;
 
     [Column("venta_monto_total")] public decimal VentaMontoTotal { get; set; }
 
