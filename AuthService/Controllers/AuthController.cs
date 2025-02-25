@@ -15,7 +15,8 @@ namespace AuthService.Controllers
         private readonly JwtService _jwtService;
         private readonly AuthDbContext _context;
 
-        public AuthController(AuthenticationService authService, AuthDbContext context, OAuthService oauthService, JwtService jwtService)
+        public AuthController(AuthenticationService authService, AuthDbContext context, OAuthService oauthService,
+            JwtService jwtService)
         {
             _authService = authService;
             _context = context;
@@ -78,7 +79,5 @@ namespace AuthService.Controllers
                 return StatusCode(500, new ErrorResponse($"Error interno: {ex.Message}"));
             }
         }
-
-
     }
 }

@@ -18,7 +18,7 @@ public class JwtUtils
     {
         var key = Encoding.UTF8.GetBytes(secret);
         var data = Encoding.UTF8.GetBytes(header + "." + payload);
-        
+
         using (var hmac = new HMACSHA256(key))
         {
             var hash = hmac.ComputeHash(data);

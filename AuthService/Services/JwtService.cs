@@ -47,7 +47,8 @@ namespace AuthService.Services
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             // Obtener y validar la duración del token
-            if (!int.TryParse(_configuration["Jwt:ExpiryDurationInHours"], out int expiryDurationInHours) || expiryDurationInHours <= 0)
+            if (!int.TryParse(_configuration["Jwt:ExpiryDurationInHours"], out int expiryDurationInHours) ||
+                expiryDurationInHours <= 0)
             {
                 throw new ArgumentException("La duración de expiración del token es inválida.");
             }
@@ -85,7 +86,7 @@ namespace AuthService.Services
                     ValidIssuer = _configuration["Jwt:Issuer"],
                     ValidAudience = _configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero  
+                    ClockSkew = TimeSpan.Zero
                 };
 
                 // Validar el token

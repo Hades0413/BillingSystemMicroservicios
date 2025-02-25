@@ -14,6 +14,13 @@ builder.Services.AddDbContext<VentaDBContext>(options =>
         .LogTo(Console.WriteLine, LogLevel.Information)
 );
 
+
+builder.Services.AddDbContext<CotizacionDBContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("sql"))
+        .EnableSensitiveDataLogging()
+        .LogTo(Console.WriteLine, LogLevel.Information)
+);
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -36,6 +43,9 @@ builder.Services.AddAuthorization(options => { });
 builder.Services.AddScoped<VentaDBContext>();
 builder.Services.AddScoped<VentaService>();
 builder.Services.AddScoped<VentaProductoService>();
+builder.Services.AddScoped<CotizacionDBContext>();
+builder.Services.AddScoped<CotizacionService>();
+builder.Services.AddScoped<CotizacionProductoService>();
 
 builder.Services.AddCors(options =>
 {

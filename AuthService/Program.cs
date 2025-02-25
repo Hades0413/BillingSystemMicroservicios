@@ -8,18 +8,14 @@ using AuthService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de la base de datos
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("sql")));
 
-// Inyección de dependencias
 builder.Services.AddScoped<AuthenticationService>();
 builder.Services.AddScoped<OAuthService>();
 builder.Services.AddScoped<JwtService>();
 
 
-
-// Configuración de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
@@ -68,7 +64,7 @@ builder.Services.AddSwaggerGen(c =>
 
     var securityRequirement = new OpenApiSecurityRequirement
     {
-        { securityScheme, new string[] {} }
+        { securityScheme, new string[] { } }
     };
 
     c.AddSecurityDefinition("Bearer", securityScheme);
@@ -95,4 +91,3 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.Run();
-
