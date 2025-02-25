@@ -1,71 +1,98 @@
 using BillingService.Models;
 using BillingService.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace BillingService.Controllers
+namespace BillingService.Controllers;
+
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class VentaController : ControllerBase
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class VentaController : ControllerBase
+    private readonly VentaService _ventaService;
+
+    public VentaController(VentaService ventaService)
     {
-        private readonly VentaService _ventaService;
+        _ventaService = ventaService;
+    }
 
-        public VentaController(VentaService ventaService)
+    [HttpPost("registrar")]
+    public async Task<IActionResult> RegistrarVenta([FromBody] VentaRequest ventaRequest)
+    {
+        if (ventaRequest == null) return BadRequest("La solicitud de venta no puede ser nula.");
+
+        if (ventaRequest.DetallesVenta == null || ventaRequest.DetallesVenta.Count == 0)
+            return BadRequest("Los detalles de la venta son obligatorios.");
+
+        if (string.IsNullOrEmpty(ventaRequest.ClienteRuc)) return BadRequest("El RUC del cliente es obligatorio.");
+
+        try
         {
-            _ventaService = ventaService;
+            var resultado = await _ventaService.RegistrarVentaAsync(
+                ventaRequest.UsuarioId,
+                ventaRequest.EmpresaId,
+                ventaRequest.ClienteId,
+                ventaRequest.TipoComprobanteId,
+                ventaRequest.FormaPago,
+                ventaRequest.DetallesVenta,
+                ventaRequest.ClienteRuc
+            );
+
+            if (!resultado.Success)
+                return StatusCode(500,
+                    $"Error al registrar la venta: {resultado.Mensaje}. Por favor, intente nuevamente.");
+
+            return Ok($"Venta registrada con éxito. ID de venta: {resultado.VentaId}");
         }
-
-        [HttpPost("registrar")]
-        public async Task<IActionResult> RegistrarVenta([FromBody] VentaRequest ventaRequest)
+        catch (ArgumentException ex)
         {
-            if (ventaRequest == null)
-            {
-                return BadRequest("La solicitud de venta no puede ser nula.");
-            }
+            return BadRequest($"Error de validación: {ex.Message}. Verifique los datos de entrada.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest($"Error de operación: {ex.Message}. Verifique los datos de entrada.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte.");
+        }
+    }
 
-            if (ventaRequest.DetallesVenta == null || ventaRequest.DetallesVenta.Count == 0)
-            {
-                return BadRequest("Los detalles de la venta son obligatorios.");
-            }
+    [HttpGet("listar")]
+    public async Task<IActionResult> ListarVentas()
+    {
+        try
+        {
+            var ventas = await _ventaService.ObtenerVentasAsync();
 
-            if (string.IsNullOrEmpty(ventaRequest.ClienteRuc))
-            {
-                return BadRequest("El RUC del cliente es obligatorio.");
-            }
+            if (ventas == null || !ventas.Any()) return NotFound("No se encontraron ventas registradas.");
 
-            try
-            {
-                var resultado = await _ventaService.RegistrarVentaAsync(
-                    ventaRequest.UsuarioId,
-                    ventaRequest.EmpresaId,
-                    ventaRequest.ClienteId,
-                    ventaRequest.TipoComprobanteId,
-                    ventaRequest.FormaPago,
-                    ventaRequest.DetallesVenta,
-                    ventaRequest.ClienteRuc
-                );
+            return Ok(ventas);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte.");
+        }
+    }
 
-                if (!resultado.Success)
-                {
-                    return StatusCode(500, $"Error al registrar la venta: {resultado.Mensaje}. Por favor, intente nuevamente.");
-                }
+    [HttpGet("listar-por-usuario/{usuarioId}")]
+    public async Task<IActionResult> ListarVentasPorUsuario(int usuarioId)
+    {
+        try
+        {
+            if (usuarioId <= 0) return BadRequest("El UsuarioId debe ser un valor mayor que cero.");
 
-                return Ok($"Venta registrada con éxito. ID de venta: {resultado.VentaId}");
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest($"Error de validación: {ex.Message}. Verifique los datos de entrada.");
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest($"Error de operación: {ex.Message}. Verifique los datos de entrada.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte.");
-            }
+            var ventas = await _ventaService.ObtenerVentasPorUsuarioIdAsync(usuarioId);
+
+            if (ventas == null || !ventas.Any())
+                return NotFound($"No se encontraron ventas para el usuario con ID {usuarioId}.");
+
+            return Ok(ventas);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte.");
         }
     }
 }
