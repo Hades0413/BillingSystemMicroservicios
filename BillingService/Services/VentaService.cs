@@ -46,7 +46,7 @@ public class VentaService
 
             var tipoComprobanteNombre = tipoComprobante.TipoComprobanteNombre;
 
-            // Aquí ya no necesitamos considerar el tipo de comprobante para la venta_venta.
+            // Buscar el control de numeración para el tipo de comprobante
             var controlNumeracion = await _dbContext.ControlNumeracion
                 .Where(cn => cn.TipoComprobanteId == tipoComprobanteId)
                 .FirstOrDefaultAsync();
@@ -59,11 +59,26 @@ public class VentaService
                         $"No se encontró la numeración para el tipo de comprobante '{tipoComprobanteNombre}'. Por favor, intente nuevamente."
                 };
 
+            // Obtener el último número de venta para ese usuario
+            var ultimaVentaUsuario = await _dbContext.Ventas
+                .Where(v => v.UsuarioId == usuarioId && v.TipoComprobanteId == tipoComprobanteId)
+                .OrderByDescending(v => v.VentaId)
+                .FirstOrDefaultAsync();
+
+            // Si ya existen ventas, incrementar el número basado en la última venta
+            int numeracionVenta = 1;
+            if (ultimaVentaUsuario != null)
+            {
+                // Extraer la numeración de la última venta (ej: VEN01-00005 -> 5)
+                var ultimaNumeracion = ultimaVentaUsuario.VentaVenta.Split('-')[1];
+                numeracionVenta = int.Parse(ultimaNumeracion) + 1;
+            }
+
             // Generar el código de venta de la siguiente forma:
             var codigoVenta = $"{controlNumeracion.Prefijo}-{controlNumeracion.Numeracion:D6}";
 
-            // Generar la venta_venta con el prefijo VEN01 y la numeración secuencial
-            var ventaVenta = $"VEN01 - {controlNumeracion.Numeracion:D5}";
+            // Generar la venta_venta con el prefijo VEN01 y la numeración secuencial por usuario
+            var ventaVenta = $"VEN01 - {numeracionVenta:D5}";
 
             var venta = new Venta
             {
@@ -78,7 +93,7 @@ public class VentaService
                 VentaMontoImpuesto = montoImpuesto,
                 VentaRucCliente = clienteRuc,
                 VentaCodigo = codigoVenta,  // El código de venta que ya estaba generando
-                VentaVenta = ventaVenta     // El nuevo campo que generamos con el prefijo VEN01 y la numeración
+                VentaVenta = ventaVenta     // El nuevo campo con la numeración secuencial por usuario
             };
 
             // Incrementar la numeración para la próxima venta
@@ -138,6 +153,7 @@ public class VentaService
         }
     }
 }
+
 
 
 
