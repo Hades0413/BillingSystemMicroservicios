@@ -30,10 +30,23 @@ public class CotizacionService
                 Mensaje = "Datos de entrada no válidos. Por favor, revise los datos e intente nuevamente."
             };
 
-        using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+        if (cotizacionFecha == DateTime.MinValue)
+        {
+            cotizacionFecha = DateTime.Now;
+        }
+
+        using (var transaction =
+               await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable))
         {
             try
             {
+                var existingCount = await _dbContext.Cotizaciones
+                    .CountAsync(c => c.UsuarioId == usuarioId);
+
+                var numeracion = existingCount + 1;
+                var prefijo = "CT01";
+                var cotizacionCodigo = $"{prefijo}-{numeracion:D6}";
+
                 var cotizacion = new Cotizacion
                 {
                     UsuarioId = usuarioId,
@@ -42,19 +55,11 @@ public class CotizacionService
                     CotizacionFecha = cotizacionFecha,
                     CotizacionMontoTotal = cotizacionMontoTotal,
                     CotizacionMontoDescuento = cotizacionMontoDescuento,
-                    CotizacionMontoImpuesto = cotizacionMontoImpuesto
+                    CotizacionMontoImpuesto = cotizacionMontoImpuesto,
+                    CotizacionCodigo = cotizacionCodigo
                 };
 
                 _dbContext.Cotizaciones.Add(cotizacion);
-                await _dbContext.SaveChangesAsync();
-
-                var cotizacionId = cotizacion.CotizacionId;
-                var prefijo = "CT01";
-                var numeracion = await _dbContext.Cotizaciones.CountAsync() + 1;
-                var cotizacionCodigo = $"{prefijo}-{numeracion:D6}";
-                cotizacion.CotizacionCodigo = cotizacionCodigo;
-
-                _dbContext.Cotizaciones.Update(cotizacion);
                 await _dbContext.SaveChangesAsync();
 
                 foreach (var producto in productos)
@@ -105,6 +110,7 @@ public class CotizacionService
             }
         }
     }
+
 
     public async Task<List<Cotizacion>> ListarCotizacionPorUsuarioAsync(int usuarioId)
     {

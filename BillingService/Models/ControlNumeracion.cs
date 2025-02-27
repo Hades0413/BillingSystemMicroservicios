@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BillingService.Models
 {
-
     [Table("ControlNumeracion")]
     public class ControlNumeracion
     {

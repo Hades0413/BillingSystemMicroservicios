@@ -16,69 +16,68 @@ public class VentaService
 
     public async Task<ResultadoVenta> RegistrarVentaAsync(int usuarioId, int empresaId, int clienteId,
         int tipoComprobanteId, string formaPago, List<VentaProducto> detallesVenta, string clienteRuc)
-{
-    if (usuarioId <= 0 || empresaId <= 0 || clienteId <= 0 || tipoComprobanteId <= 0 || detallesVenta == null ||
-        detallesVenta.Count == 0)
-        return new ResultadoVenta
-        {
-            Success = false,
-            Mensaje = "Datos de entrada no válidos. Por favor, revise los datos e intente nuevamente."
-        };
-
-    using (var transaction = await _dbContext.Database.BeginTransactionAsync())
     {
+        if (usuarioId <= 0 || empresaId <= 0 || clienteId <= 0 || tipoComprobanteId <= 0 || detallesVenta == null ||
+            detallesVenta.Count == 0)
+        {
+            return new ResultadoVenta
+            {
+                Success = false,
+                Mensaje = "Datos de entrada no válidos. Por favor, revise los datos e intente nuevamente."
+            };
+        }
+
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
             var montoTotal = detallesVenta.Sum(vp => vp.Cantidad * vp.PrecioUnitario);
             var montoImpuesto = montoTotal * 0.18m;
 
             var tipoComprobante = await _dbContext.TipoComprobante
-                .Where(tc => tc.TipoComprobanteId == tipoComprobanteId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(tc => tc.TipoComprobanteId == tipoComprobanteId);
 
             if (tipoComprobante == null)
+            {
                 return new ResultadoVenta
                 {
                     Success = false,
-                    Mensaje =
-                        "Tipo de comprobante no válido o no encontrado. Verifique el tipo de comprobante e intente nuevamente."
+                    Mensaje = "Tipo de comprobante no válido o no encontrado."
                 };
+            }
 
-            var tipoComprobanteNombre = tipoComprobante.TipoComprobanteNombre;
-
-            // Buscar el control de numeración para el tipo de comprobante
             var controlNumeracion = await _dbContext.ControlNumeracion
-                .Where(cn => cn.TipoComprobanteId == tipoComprobanteId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cn => cn.TipoComprobanteId == tipoComprobanteId);
 
             if (controlNumeracion == null)
+            {
                 return new ResultadoVenta
                 {
                     Success = false,
                     Mensaje =
-                        $"No se encontró la numeración para el tipo de comprobante '{tipoComprobanteNombre}'. Por favor, intente nuevamente."
+                        $"No se encontró la numeración para el tipo de comprobante '{tipoComprobante.TipoComprobanteNombre}'."
                 };
+            }
 
-            // Obtener el último número de venta para ese usuario
             var ultimaVentaUsuario = await _dbContext.Ventas
+                .Where(v => v.UsuarioId == usuarioId)
+                .OrderByDescending(v => v.VentaId)
+                .FirstOrDefaultAsync();
+
+            int numeracionVenta = ultimaVentaUsuario != null
+                ? int.Parse(ultimaVentaUsuario.VentaVenta.Split('-')[1]) + 1
+                : 1;
+
+            var ultimaVentaPorUsuarioYTipo = await _dbContext.Ventas
                 .Where(v => v.UsuarioId == usuarioId && v.TipoComprobanteId == tipoComprobanteId)
                 .OrderByDescending(v => v.VentaId)
                 .FirstOrDefaultAsync();
 
-            // Si ya existen ventas, incrementar el número basado en la última venta
-            int numeracionVenta = 1;
-            if (ultimaVentaUsuario != null)
-            {
-                // Extraer la numeración de la última venta (ej: VEN01-00005 -> 5)
-                var ultimaNumeracion = ultimaVentaUsuario.VentaVenta.Split('-')[1];
-                numeracionVenta = int.Parse(ultimaNumeracion) + 1;
-            }
+            int numeracionCodigo = ultimaVentaPorUsuarioYTipo != null
+                ? int.Parse(ultimaVentaPorUsuarioYTipo.VentaCodigo.Split('-')[1]) + 1
+                : 1;
 
-            // Generar el código de venta de la siguiente forma:
-            var codigoVenta = $"{controlNumeracion.Prefijo}-{controlNumeracion.Numeracion:D6}";
-
-            // Generar la venta_venta con el prefijo VEN01 y la numeración secuencial por usuario
-            var ventaVenta = $"VEN01 - {numeracionVenta:D5}";
+            var codigoVenta = $"{controlNumeracion.Prefijo}-{numeracionCodigo:D6}";
+            var ventaVenta = $"VEN01-{numeracionVenta:D5}";
 
             var venta = new Venta
             {
@@ -92,13 +91,11 @@ public class VentaService
                 VentaMontoDescuento = 0,
                 VentaMontoImpuesto = montoImpuesto,
                 VentaRucCliente = clienteRuc,
-                VentaCodigo = codigoVenta,  // El código de venta que ya estaba generando
-                VentaVenta = ventaVenta     // El nuevo campo con la numeración secuencial por usuario
+                VentaCodigo = codigoVenta,
+                VentaVenta = ventaVenta
             };
 
-            // Incrementar la numeración para la próxima venta
             controlNumeracion.Numeracion++;
-
             _dbContext.Ventas.Add(venta);
             await _dbContext.SaveChangesAsync();
 
@@ -107,17 +104,14 @@ public class VentaService
 
             foreach (var detalle in detallesVenta)
             {
-                detalle.Total = detalle.Cantidad * detalle.PrecioUnitario;
-
                 var ventaProducto = new VentaProducto
                 {
                     VentaId = venta.VentaId,
                     ProductoId = detalle.ProductoId,
                     Cantidad = detalle.Cantidad,
                     PrecioUnitario = detalle.PrecioUnitario,
-                    Total = detalle.Total
+                    Total = detalle.Cantidad * detalle.PrecioUnitario
                 };
-
                 _dbContext.VentaProductos.Add(ventaProducto);
             }
 
@@ -128,17 +122,8 @@ public class VentaService
             {
                 Success = true,
                 VentaId = venta.VentaId,
-                Mensaje = $"Venta registrada con éxito. Código de venta: {codigoVenta}. Código de venta (VEN01): {ventaVenta}."
-            };
-        }
-        catch (DbUpdateException dbEx)
-        {
-            await transaction.RollbackAsync();
-            return new ResultadoVenta
-            {
-                Success = false,
                 Mensaje =
-                    "Error al registrar la venta en la base de datos. Verifique la información y los datos ingresados."
+                    $"Venta registrada con éxito. Código de venta: {codigoVenta}. Código de venta (VEN01): {ventaVenta}."
             };
         }
         catch (Exception ex)
@@ -147,14 +132,10 @@ public class VentaService
             return new ResultadoVenta
             {
                 Success = false,
-                Mensaje =
-                    "Ocurrió un error inesperado. Por favor, intente nuevamente. Si el problema persiste, contacte al soporte."
+                Mensaje = "Ocurrió un error inesperado. Intente nuevamente o contacte al soporte."
             };
         }
     }
-}
-
-
 
 
     public async Task<List<Venta>> ObtenerVentasAsync()

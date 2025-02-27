@@ -8,8 +8,8 @@ public class Venta
 {
     [Key] [Column("venta_id")] public int VentaId { get; set; }
 
-    [Column("venta_venta")] public string VentaVenta { get; set; } 
-    
+    [Column("venta_venta")] public string VentaVenta { get; set; }
+
     [Column("venta_codigo")] public string VentaCodigo { get; set; } = Guid.NewGuid().ToString();
 
     [Column("venta_fecha")] public DateTime VentaFecha { get; set; } = DateTime.Now;

@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomerService", "CustomerService\CustomerService.csproj", "{F764F49E-E2FD-4761-90DB-CE369687ECAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "NotificationService\NotificationService.csproj", "{B01D2FA4-8553-43E6-BF82-062136611B62}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{B1A050D1-E695-4A67-922C-F039DCC07D61}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{4234C4C9-1770-4D6D-AB86-653662004044}"
@@ -61,18 +59,6 @@ Global
 		{F764F49E-E2FD-4761-90DB-CE369687ECAC}.Release|x64.Build.0 = Release|Any CPU
 		{F764F49E-E2FD-4761-90DB-CE369687ECAC}.Release|x86.ActiveCfg = Release|Any CPU
 		{F764F49E-E2FD-4761-90DB-CE369687ECAC}.Release|x86.Build.0 = Release|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Debug|x64.Build.0 = Debug|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Debug|x86.Build.0 = Debug|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Release|x64.ActiveCfg = Release|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Release|x64.Build.0 = Release|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Release|x86.ActiveCfg = Release|Any CPU
-		{B01D2FA4-8553-43E6-BF82-062136611B62}.Release|x86.Build.0 = Release|Any CPU
 		{B1A050D1-E695-4A67-922C-F039DCC07D61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B1A050D1-E695-4A67-922C-F039DCC07D61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1A050D1-E695-4A67-922C-F039DCC07D61}.Debug|x64.ActiveCfg = Debug|Any CPU
