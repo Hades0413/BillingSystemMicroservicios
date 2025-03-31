@@ -90,3 +90,12 @@
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/AuthService.genruntimeconfig.cache
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/ref/AuthService.dll
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/obj/Debug/net9.0/AuthService.sourcelink.json
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Caching.Abstractions.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Caching.Memory.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Configuration.Abstractions.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Logging.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Options.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Primitives.dll

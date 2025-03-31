@@ -56,14 +56,18 @@ public class CotizacionController : ControllerBase
         try
         {
             var cotizaciones = await _cotizacionService.ListarCotizacionPorUsuarioAsync(usuarioId);
-            if (cotizaciones == null || cotizaciones.Count == 0)
-                return NotFound("No se encontraron cotizaciones para este usuario.");
 
-            return Ok(cotizaciones);
+            if (cotizaciones == null || cotizaciones.Count == 0)
+            {
+                return NotFound(new { code = 404, message = $"El usuario actual no tiene cotizaciones, por favor realice una nueva cotización." });
+            }
+
+            return Ok(new { code = 200, message = "Cotizaciones obtenidas correctamente.", data = cotizaciones });
         }
         catch (Exception ex)
         {
-            return BadRequest($"Ocurrió un error: {ex.Message}");
+            return BadRequest(new { code = 400, message = $"Ocurrió un error: {ex.Message}" });
         }
     }
+
 }
