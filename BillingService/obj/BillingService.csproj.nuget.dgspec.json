@@ -90,6 +90,10 @@
               "target": "Package",
               "version": "[9.0.2, )"
             },
+            "Ocelot": {
+              "target": "Package",
+              "version": "[23.4.3, )"
+            },
             "System.Reflection.Emit": {
               "target": "Package",
               "version": "[4.7.0, )"

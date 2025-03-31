@@ -4,79 +4,38 @@ namespace ApiGateway.Services
 {
     public class ApiGatewayService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
         private readonly ILogger<ApiGatewayService> _logger;
+        private readonly HttpClient _httpClient;
 
-        public ApiGatewayService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ApiGatewayService> logger)
+        public ApiGatewayService(ILogger<ApiGatewayService> logger, HttpClient httpClient)
         {
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
             _logger = logger;
+            _httpClient = httpClient;
         }
 
-        public async Task<string> ValidateTokenAsync(string token)
+        public async Task<string> ForwardRequestAsync(string url)
         {
             try
             {
-                var authServiceUrl = _configuration["Microservices:AuthService"] + "/api/auth/validate-token";
-                var client = _httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var response = await client.GetAsync(authServiceUrl);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogError($"Error al llamar a AuthService para validar el token: {response.StatusCode}");
-                    return null;
-                }
+                _logger.LogInformation($"Redirigiendo solicitud a: {url}");
+            
+                var response = await _httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode(); // Lanza una excepción si el código de estado no es 2xx
 
                 var content = await response.Content.ReadAsStringAsync();
                 return content;
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"Error de red al llamar a AuthService: {ex.Message}");
-                return null;
-            }
-        }
-
-      public async Task<string> GetAccessTokenAsync(string code)
-        {
-            try
-            {
-                var clientId = _configuration["OAuth2:ClientId"];
-                var clientSecret = _configuration["OAuth2:ClientSecret"];
-                var redirectUri = _configuration["OAuth2:RedirectUri"];
-                var tokenUrl = _configuration["OAuth2:Authority"] + "/access_token";
-
-                var client = _httpClientFactory.CreateClient();
-
-                var tokenResponse = await client.PostAsync(tokenUrl, new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    { "client_id", clientId },
-                    { "client_secret", clientSecret },
-                    { "code", code },
-                    { "redirect_uri", redirectUri }
-                }));
-
-                var responseString = await tokenResponse.Content.ReadAsStringAsync();
-                var queryParams = QueryHelpers.ParseQuery(responseString);
-                var accessToken = queryParams["access_token"].ToString();
-
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    _logger.LogError("No se pudo obtener el token de acceso de GitHub.");
-                    return null;
-                }
-
-                return accessToken;
+                _logger.LogError($"Error al conectar con {url}: {ex.Message}");
+                throw new Exception("El servicio no está disponible en este momento.");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error al obtener el token de GitHub: {ex.Message}");
-                return null;
+                _logger.LogError($"Error inesperado en el API Gateway: {ex.Message}");
+                throw new Exception("Se produjo un error inesperado en el API Gateway.");
             }
         }
     }
+
 }

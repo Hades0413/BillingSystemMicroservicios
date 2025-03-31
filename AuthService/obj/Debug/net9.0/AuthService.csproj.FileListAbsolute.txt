@@ -99,3 +99,11 @@
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Logging.Abstractions.dll
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Options.dll
 /mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.Primitives.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/FluentValidation.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/IPAddressRange.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.AspNetCore.JsonPatch.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.AspNetCore.MiddlewareAnalysis.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Microsoft.Extensions.DiagnosticAdapter.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Newtonsoft.Json.Bson.dll
+/mnt/Disco2/Proyectos-Repo/BillingSystem/AuthService/bin/Debug/net9.0/Ocelot.dll

@@ -1,11 +1,18 @@
 using System.Text;
+using ApiGateway.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configura la autenticación JWT
+// Agregar configuración de Ocelot
+builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Services.AddOcelot();
+
+// Configuración de autenticación JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -17,16 +24,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? string.Empty))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? string.Empty)
+            )
         };
     });
 
-// Configura autorización
-builder.Services.AddAuthorization(options => { });
-
-
-// Configura CORS
+// Configuración de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
@@ -36,6 +40,10 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+
+// Inyectar el servicio personalizado
+builder.Services.AddHttpClient<ApiGatewayService>();
+builder.Services.AddScoped<ApiGatewayService>();
 
 // Agregar controladores
 builder.Services.AddControllers();
@@ -47,9 +55,11 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
+        Description = "Ingrese un token válido",
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -71,27 +81,23 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // Configuración del entorno de desarrollo
-if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
-
-// Configuración de routing
-app.UseRouting();
-
-// Configuración de CORS
-app.UseCors("AllowSpecificOrigin");
-
-// Configuración de autenticación y autorización
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Configuración de Swagger UI para el entorno de desarrollo
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Configuración de middleware
+app.UseRouting();
+app.UseCors("AllowSpecificOrigin");
+app.UseAuthentication();
+app.UseAuthorization();
+
+await app.UseOcelot();
+
 // Configuración de los controladores de la API
 app.MapControllers();
 
-// Ejecutar la aplicación en el puerto 5000
-app.Run("http://localhost:5000");
+// Ejecutar la aplicación
+app.Run();

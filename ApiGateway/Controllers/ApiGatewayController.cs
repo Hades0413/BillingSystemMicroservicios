@@ -5,58 +5,51 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ApiGateway.Services;
 
 namespace ApiGateway.Controllers
 {
+    [Route("api/gateway")]
     [ApiController]
-    [Route("api/[controller]")]
     public class ApiGatewayController : ControllerBase
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
+        private readonly ApiGatewayService _apiGatewayService;
+        private readonly ILogger<ApiGatewayController> _logger;
 
-        public ApiGatewayController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public ApiGatewayController(ApiGatewayService apiGatewayService, ILogger<ApiGatewayController> logger)
         {
-            _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
+            _apiGatewayService = apiGatewayService;
+            _logger = logger;
         }
 
-        [HttpPost("registrar-venta")]
-        [Authorize]
-        public async Task<IActionResult> RegistrarVenta([FromBody] JsonElement ventaRequest)
+        // Endpoint para verificar si el API Gateway está funcionando
+        [HttpGet("health")]
+        public IActionResult HealthCheck()
         {
-            var client = _httpClientFactory.CreateClient();
-            var billingServiceUrl = _configuration["Microservices:BillingService"] + "/api/venta/registrar";
-
-            var content = new StringContent(ventaRequest.ToString(), Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync(billingServiceUrl, content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return StatusCode((int)response.StatusCode, new { message = "Error al registrar la venta" });
-            }
-
-            var responseData = await response.Content.ReadAsStringAsync();
-            return Ok(new { message = "Venta registrada con éxito", data = responseData });
+            _logger.LogInformation("Solicitud de verificación de estado recibida.");
+            return Ok(new { status = "API Gateway está funcionando correctamente." });
         }
 
-        [HttpGet("listar-ventas")]
-        [Authorize]
-        public async Task<IActionResult> ListarVentas()
+        // Endpoint para manejar errores personalizados y reenviar solicitudes
+        [HttpGet("forward")]
+        public async Task<IActionResult> ForwardRequest([FromQuery] string url)
         {
-            var client = _httpClientFactory.CreateClient();
-            var billingServiceUrl = _configuration["Microservices:BillingService"] + "/api/venta/listar";
-
-            var response = await client.GetAsync(billingServiceUrl);
-
-            if (!response.IsSuccessStatusCode)
+            if (string.IsNullOrEmpty(url))
             {
-                return StatusCode((int)response.StatusCode, new { message = "Error al obtener las ventas" });
+                _logger.LogWarning("Solicitud de redirección sin URL.");
+                return BadRequest(new { error = "Debe proporcionar una URL válida." });
             }
 
-            var responseData = await response.Content.ReadAsStringAsync();
-            return Ok(new { message = "Ventas obtenidas con éxito", data = responseData });
+            try
+            {
+                var response = await _apiGatewayService.ForwardRequestAsync(url);
+                return Ok(new { message = "Solicitud procesada con éxito.", data = response });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error en la solicitud de redirección: {ex.Message}");
+                return StatusCode(500, new { error = "Hubo un problema al procesar la solicitud.", details = ex.Message });
+            }
         }
     }
 }
