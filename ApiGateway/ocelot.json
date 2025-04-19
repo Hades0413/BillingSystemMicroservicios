@@ -4,37 +4,57 @@
       "DownstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5001 }
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
       ],
       "UpstreamPathTemplate": "/auth/login",
-      "UpstreamHttpMethod": ["Post"]
+      "UpstreamHttpMethod": [
+        "Post"
+      ]
     },
     {
       "DownstreamPathTemplate": "/api/auth/oauth2-login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5001 }
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
       ],
       "UpstreamPathTemplate": "/auth/oauth2-login",
-      "UpstreamHttpMethod": ["Get"]
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
     },
     {
       "DownstreamPathTemplate": "/api/auth/oauth2-callback",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5001 }
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
       ],
       "UpstreamPathTemplate": "/auth/oauth2-callback",
-      "UpstreamHttpMethod": ["Get"]
+      "UpstreamHttpMethod": [
+        "Get"
+      ]
     },
     {
       "DownstreamPathTemplate": "/api/venta/registrar",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/venta/registrar",
-      "UpstreamHttpMethod": ["Post"],
+      "UpstreamHttpMethod": [
+        "Post"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -44,10 +64,15 @@
       "DownstreamPathTemplate": "/api/venta/listar",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/venta/listar",
-      "UpstreamHttpMethod": ["Get"],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -57,10 +82,15 @@
       "DownstreamPathTemplate": "/api/venta/listar-por-usuario/{usuarioId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/venta/listar-por-usuario/{usuarioId}",
-      "UpstreamHttpMethod": ["Get"],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -70,10 +100,15 @@
       "DownstreamPathTemplate": "/api/cotizacion/registrar",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/cotizacion/registrar",
-      "UpstreamHttpMethod": ["Post"],
+      "UpstreamHttpMethod": [
+        "Post"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -83,10 +118,15 @@
       "DownstreamPathTemplate": "/api/cotizacion/listar-por-usuario/{usuarioId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/cotizacion/listar-por-usuario/{usuarioId}",
-      "UpstreamHttpMethod": ["Get"],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -96,10 +136,15 @@
       "DownstreamPathTemplate": "/api/cotizacionproducto/listar-por-cotizacion/{cotizacionId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/cotizacionproducto/listar-por-cotizacion/{cotizacionId}",
-      "UpstreamHttpMethod": ["Get"],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -109,10 +154,15 @@
       "DownstreamPathTemplate": "/api/ventaproducto/listar",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/ventaproducto/listar",
-      "UpstreamHttpMethod": ["Get"],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -122,10 +172,15 @@
       "DownstreamPathTemplate": "/api/ventaproducto/listar-por-venta/{ventaId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5002 }
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
       ],
       "UpstreamPathTemplate": "/ventaproducto/listar-por-venta/{ventaId}",
-      "UpstreamHttpMethod": ["Get"],
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -135,10 +190,15 @@
       "DownstreamPathTemplate": "/api/health",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "localhost", "Port": 5003 }
+        {
+          "Host": "localhost",
+          "Port": 5003
+        }
       ],
       "UpstreamPathTemplate": "/api/gateway/health",
-      "UpstreamHttpMethod": ["GET"],
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []

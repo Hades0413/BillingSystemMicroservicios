@@ -1,20 +1,16 @@
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
+namespace AuthService.Services;
 
-namespace AuthService.Services
+public class OAuthService
 {
-    public class OAuthService
+    private readonly IConfiguration _configuration;
+
+    public OAuthService(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public OAuthService(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public async Task<bool> ValidateOAuthToken(string token)
-        {
-            return await Task.FromResult(true);
-        }
+    public async Task<bool> ValidateOAuthToken(string token)
+    {
+        return await Task.FromResult(true);
     }
 }

@@ -82,23 +82,23 @@ public class VentaController : ControllerBase
         try
         {
             if (usuarioId <= 0)
-            {
                 return BadRequest(new { code = 400, message = "El UsuarioId debe ser un valor mayor que cero." });
-            }
 
             var ventas = await _ventaService.ObtenerVentasPorUsuarioIdAsync(usuarioId);
 
             if (ventas == null || !ventas.Any())
-            {
-                return NotFound(new { code = 404, message = $"El usuario actual no tiene ventas, por favor realice una nueva venta." });
-            }
+                return NotFound(new
+                    { code = 404, message = "El usuario actual no tiene ventas, por favor realice una nueva venta." });
 
             return Ok(new { code = 200, message = "Ventas obtenidas correctamente.", data = ventas });
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { code = 500, message = $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte." });
+            return StatusCode(500,
+                new
+                {
+                    code = 500, message = $"Error interno del servidor: {ex.Message}. Por favor, contacte al soporte."
+                });
         }
     }
-
 }

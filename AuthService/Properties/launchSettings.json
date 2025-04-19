@@ -18,6 +18,24 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "AuthService": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Jwt__SecretKey": "];!`opZme*OJ.Z-k;Tp/8tboc*?lg&^?d'%lENYMqf=]rN)bIJnRAYcrKxu1o[2dvRNV]DdiW>PZER7SQ/9XwoH2.*u$(V`DHbnV&5DTLknw|]mP9_NeY#EfyGz`Cm}^",
+        "Jwt__Issuer": "AuthService",
+        "Jwt__Audience": "AuthServiceUsers",
+        "Jwt__ExpiryDurationInHours": "1",
+        "OAuth2__ClientId": "Ov23libRJdbWyx1spcbK",
+        "OAuth2__ClientSecret": "86ef7d6e1ef40263700b1582431bc267a0ec5e91",
+        "OAuth2__RedirectUri": "http://localhost:4200/dashboard",
+        "OAuth2__Authority": "https://github.com/login/oauth",
+        "ConnectionStrings__sql": "Server=.;Database=BD_BillingSystem;User Id=sa;Password=H@des0413;TrustServerCertificate=true;"
+      }
     }
   }
 }

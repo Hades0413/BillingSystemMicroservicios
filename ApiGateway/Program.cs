@@ -9,7 +9,7 @@ using Ocelot.Middleware;
 var builder = WebApplication.CreateBuilder(args);
 
 // Agregar configuración de Ocelot
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile("ocelot.json", false, true);
 builder.Services.AddOcelot();
 
 // Configuración de autenticación JWT
@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")  // Cambia esta URL si es necesario
+        policy.WithOrigins("http://localhost:4200") // Cambia esta URL si es necesario
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

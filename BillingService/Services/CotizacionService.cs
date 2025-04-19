@@ -1,3 +1,4 @@
+using System.Data;
 using BillingService.Data;
 using BillingService.Models;
 using Microsoft.EntityFrameworkCore;
@@ -30,13 +31,10 @@ public class CotizacionService
                 Mensaje = "Datos de entrada no válidos. Por favor, revise los datos e intente nuevamente."
             };
 
-        if (cotizacionFecha == DateTime.MinValue)
-        {
-            cotizacionFecha = DateTime.Now;
-        }
+        if (cotizacionFecha == DateTime.MinValue) cotizacionFecha = DateTime.Now;
 
         using (var transaction =
-               await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable))
+               await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             try
             {

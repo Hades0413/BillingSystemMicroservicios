@@ -1,8 +1,7 @@
-namespace AuthService.Models
+namespace AuthService.Models;
+
+public class AuthServiceOAuthRequest
 {
-    public class AuthServiceOAuthRequest
-    {
-        public string Token { get; set; }
-        public string Email { get; set; }
-    }
+    public string Token { get; set; }
+    public string Email { get; set; }
 }

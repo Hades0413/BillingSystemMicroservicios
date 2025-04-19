@@ -19,13 +19,11 @@ public class VentaService
     {
         if (usuarioId <= 0 || empresaId <= 0 || clienteId <= 0 || tipoComprobanteId <= 0 || detallesVenta == null ||
             detallesVenta.Count == 0)
-        {
             return new ResultadoVenta
             {
                 Success = false,
                 Mensaje = "Datos de entrada no válidos. Por favor, revise los datos e intente nuevamente."
             };
-        }
 
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
@@ -37,33 +35,29 @@ public class VentaService
                 .FirstOrDefaultAsync(tc => tc.TipoComprobanteId == tipoComprobanteId);
 
             if (tipoComprobante == null)
-            {
                 return new ResultadoVenta
                 {
                     Success = false,
                     Mensaje = "Tipo de comprobante no válido o no encontrado."
                 };
-            }
 
             var controlNumeracion = await _dbContext.ControlNumeracion
                 .FirstOrDefaultAsync(cn => cn.TipoComprobanteId == tipoComprobanteId);
 
             if (controlNumeracion == null)
-            {
                 return new ResultadoVenta
                 {
                     Success = false,
                     Mensaje =
                         $"No se encontró la numeración para el tipo de comprobante '{tipoComprobante.TipoComprobanteNombre}'."
                 };
-            }
 
             var ultimaVentaUsuario = await _dbContext.Ventas
                 .Where(v => v.UsuarioId == usuarioId)
                 .OrderByDescending(v => v.VentaId)
                 .FirstOrDefaultAsync();
 
-            int numeracionVenta = ultimaVentaUsuario != null
+            var numeracionVenta = ultimaVentaUsuario != null
                 ? int.Parse(ultimaVentaUsuario.VentaVenta.Split('-')[1]) + 1
                 : 1;
 
@@ -72,7 +66,7 @@ public class VentaService
                 .OrderByDescending(v => v.VentaId)
                 .FirstOrDefaultAsync();
 
-            int numeracionCodigo = ultimaVentaPorUsuarioYTipo != null
+            var numeracionCodigo = ultimaVentaPorUsuarioYTipo != null
                 ? int.Parse(ultimaVentaPorUsuarioYTipo.VentaCodigo.Split('-')[1]) + 1
                 : 1;
 

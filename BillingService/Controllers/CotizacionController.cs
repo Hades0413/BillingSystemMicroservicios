@@ -58,9 +58,11 @@ public class CotizacionController : ControllerBase
             var cotizaciones = await _cotizacionService.ListarCotizacionPorUsuarioAsync(usuarioId);
 
             if (cotizaciones == null || cotizaciones.Count == 0)
-            {
-                return NotFound(new { code = 404, message = $"El usuario actual no tiene cotizaciones, por favor realice una nueva cotización." });
-            }
+                return NotFound(new
+                {
+                    code = 404,
+                    message = "El usuario actual no tiene cotizaciones, por favor realice una nueva cotización."
+                });
 
             return Ok(new { code = 200, message = "Cotizaciones obtenidas correctamente.", data = cotizaciones });
         }
@@ -69,5 +71,4 @@ public class CotizacionController : ControllerBase
             return BadRequest(new { code = 400, message = $"Ocurrió un error: {ex.Message}" });
         }
     }
-
 }

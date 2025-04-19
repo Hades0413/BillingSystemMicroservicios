@@ -1,109 +1,99 @@
-using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.IdentityModel.Tokens.Jwt;
 using AuthService.Models;
+using Microsoft.IdentityModel.Tokens;
 
-namespace AuthService.Services
+namespace AuthService.Services;
+
+public class JwtService
 {
-    public class JwtService
+    private readonly IConfiguration _configuration;
+
+    public JwtService(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public JwtService(IConfiguration configuration)
+    public string GenerateJwtToken(Usuario usuario)
+    {
+        if (usuario == null) throw new ArgumentNullException(nameof(usuario), "El usuario no puede ser nulo.");
+
+        var claims = new[]
         {
-            _configuration = configuration;
-        }
+            new Claim(ClaimTypes.Name, usuario.UsuarioCorreo),
+            new Claim(ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString())
+        };
 
-        public string GenerateJwtToken(Usuario usuario)
+        var secretKey = _configuration["Jwt:SecretKey"];
+        if (string.IsNullOrEmpty(secretKey))
+            throw new ArgumentException("La clave secreta no está configurada en el archivo de configuración.");
+
+        var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+        if (keyBytes.Length < 32)
+            throw new ArgumentException("La clave secreta debe tener al menos 32 caracteres (256 bits).");
+
+        var key = new SymmetricSecurityKey(keyBytes);
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        if (!int.TryParse(_configuration["Jwt:ExpiryDurationInHours"], out var expiryDurationInHours) ||
+            expiryDurationInHours <= 0)
+            throw new ArgumentException("La duración de expiración del token es inválida.");
+
+        var expiryDate = DateTime.UtcNow.AddHours(expiryDurationInHours);
+
+        var token = new JwtSecurityToken(
+            _configuration["Jwt:Issuer"],
+            _configuration["Jwt:Audience"],
+            claims,
+            expires: expiryDate,
+            signingCredentials: creds
+        );
+
+        Console.WriteLine($"Token generado con expiración en: {expiryDate}");
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public bool ValidateJwtToken(string token)
+    {
+        try
         {
-            if (usuario == null)
-            {
-                throw new ArgumentNullException(nameof(usuario), "El usuario no puede ser nulo.");
-            }
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
 
-            var claims = new[]
+            var validationParameters = new TokenValidationParameters
             {
-                new Claim(ClaimTypes.Name, usuario.UsuarioCorreo),
-                new Claim(ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString()),
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = _configuration["Jwt:Issuer"],
+                ValidAudience = _configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ClockSkew = TimeSpan.Zero
             };
 
-            var secretKey = _configuration["Jwt:SecretKey"];
-            if (string.IsNullOrEmpty(secretKey))
-            {
-                throw new ArgumentException("La clave secreta no está configurada en el archivo de configuración.");
-            }
+            var validatedToken = tokenHandler.ValidateToken(token, validationParameters, out _);
 
-            var keyBytes = Encoding.UTF8.GetBytes(secretKey);
-            if (keyBytes.Length < 32)
-            {
-                throw new ArgumentException("La clave secreta debe tener al menos 32 caracteres (256 bits).");
-            }
+            Console.WriteLine("Token validado exitosamente.");
 
-            var key = new SymmetricSecurityKey(keyBytes);
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            if (!int.TryParse(_configuration["Jwt:ExpiryDurationInHours"], out int expiryDurationInHours) ||
-                expiryDurationInHours <= 0)
-            {
-                throw new ArgumentException("La duración de expiración del token es inválida.");
-            }
-
-            var expiryDate = DateTime.UtcNow.AddHours(expiryDurationInHours);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: expiryDate,
-                signingCredentials: creds
-            );
-
-            Console.WriteLine($"Token generado con expiración en: {expiryDate}");
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return true;
         }
-
-        public bool ValidateJwtToken(string token)
+        catch (SecurityTokenExpiredException ex)
         {
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]);
-
-                var validationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = _configuration["Jwt:Issuer"],
-                    ValidAudience = _configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero
-                };
-
-                var validatedToken = tokenHandler.ValidateToken(token, validationParameters, out var _);
-
-                Console.WriteLine("Token validado exitosamente.");
-
-                return true;
-            }
-            catch (SecurityTokenExpiredException ex)
-            {
-                Console.WriteLine($"Token expirado: {ex.Message}");
-                return false;
-            }
-            catch (SecurityTokenException ex)
-            {
-                Console.WriteLine($"Token de seguridad inválido: {ex.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error general en la validación del token: {ex.Message}");
-                return false;
-            }
+            Console.WriteLine($"Token expirado: {ex.Message}");
+            return false;
+        }
+        catch (SecurityTokenException ex)
+        {
+            Console.WriteLine($"Token de seguridad inválido: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error general en la validación del token: {ex.Message}");
+            return false;
         }
     }
 }
