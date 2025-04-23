@@ -94,6 +94,10 @@
               "target": "Package",
               "version": "[9.0.2, )"
             },
+            "NWebsec.AspNetCore.Middleware": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            },
             "NetEscapades.AspNetCore.SecurityHeaders": {
               "target": "Package",
               "version": "[1.0.0, )"
