@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/mnt/Disco2/Proyectos-Repo/BillingSystem/ApiGateway/ApiGateway.csproj": {}
+    "/mnt/Disco2/Net/BillingSystem/BillingSystemMicroservices/ApiGateway/ApiGateway.csproj": {}
   },
   "projects": {
-    "/mnt/Disco2/Proyectos-Repo/BillingSystem/ApiGateway/ApiGateway.csproj": {
+    "/mnt/Disco2/Net/BillingSystem/BillingSystemMicroservices/ApiGateway/ApiGateway.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/mnt/Disco2/Proyectos-Repo/BillingSystem/ApiGateway/ApiGateway.csproj",
+        "projectUniqueName": "/mnt/Disco2/Net/BillingSystem/BillingSystemMicroservices/ApiGateway/ApiGateway.csproj",
         "projectName": "ApiGateway",
-        "projectPath": "/mnt/Disco2/Proyectos-Repo/BillingSystem/ApiGateway/ApiGateway.csproj",
+        "projectPath": "/mnt/Disco2/Net/BillingSystem/BillingSystemMicroservices/ApiGateway/ApiGateway.csproj",
         "packagesPath": "/home/hades/.nuget/packages/",
-        "outputPath": "/mnt/Disco2/Proyectos-Repo/BillingSystem/ApiGateway/obj/",
+        "outputPath": "/mnt/Disco2/Net/BillingSystem/BillingSystemMicroservices/ApiGateway/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/hades/.nuget/NuGet/NuGet.Config"
